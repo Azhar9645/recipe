@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/adminscreen/bottomnavbaradmin.dart';
 import 'package:recipe_app1/screens/loginscreen/signin.dart';
 
-class AdminProfile extends StatelessWidget {
+class AdminProfile extends StatefulWidget {
   const AdminProfile({super.key});
 
+  @override
+  State<AdminProfile> createState() => _AdminProfileState();
+}
+
+class _AdminProfileState extends State<AdminProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +38,7 @@ class AdminProfile extends StatelessWidget {
           ),
         ],
       ),
+     
     );
   }
 }

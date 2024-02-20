@@ -264,8 +264,8 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                 MyTextfield(
                   controller: directionController,
                   hintText: 'Step by step',
-                  
                   maxline: null,
+                  isNumbered: true,
                 ),
                 const SizedBox(height: 15),
                 Row(
