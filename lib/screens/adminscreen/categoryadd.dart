@@ -212,26 +212,34 @@ class _CategoryAddState extends State<CategoryAdd> {
                       ),
                       child: ListTile(
                         onTap: () async {
-                          // Capture the context before entering the asynchronous block
-                          BuildContext contextBeforeAsync = context;
+                          // Store the required data before entering the asynchronous block
+                          String selectedCategoryText = categoryText;
 
-                          setState(() {
-                            selectedCategory = categoryText;
-                          });
-
-                          Map<String, dynamic> recipeData =
+                          // Fetch recipe data for the selected category
+                          List<Map<String, dynamic>>? recipeDataList =
                               await firestoreServices
-                                  .getRecipeData(categoryText);
+                                  .getRecipeData(selectedCategoryText);
 
-                          Navigator.push(
-                            contextBeforeAsync, // Use the captured context
-                            MaterialPageRoute(
-                              builder: (context) => CategoryPage(
-                                categoryName: categoryText,
-                                recipes: [recipeData],
+                          // Check if recipeDataList is not null and not empty
+                          if (recipeDataList != null &&
+                              recipeDataList.isNotEmpty) {
+                            // Capture the context after the asynchronous block
+                            BuildContext contextAfterAsync = context;
+
+                            Navigator.push(
+                              contextAfterAsync,
+                              MaterialPageRoute(
+                                builder: (context) => CategoryPage(
+                                  categoryName: selectedCategoryText,
+                                  recipes: recipeDataList,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            // Handle the case where no recipes are found
+                            print(
+                                "No recipes found for category: $selectedCategoryText");
+                          }
                         },
                         title: Text(categoryText.toUpperCase()),
                         trailing: Row(

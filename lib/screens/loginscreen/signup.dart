@@ -165,15 +165,6 @@ class SignUp extends StatelessWidget {
                                     'assets/lottie/Animation - 1707395406065.json',
                                     fit: BoxFit.fill,
                                   ),
-                                  // SizedBox(height: 16),
-                                  // const Text(
-                                  //   'Cooking...',
-                                  //   style: TextStyle(
-                                  //       fontSize: 20,
-                                  //       fontWeight: FontWeight.bold,
-                                  //       color: Color(0xFFE23E3E)
-                                  //       ),
-                                  // ),
                                 ],
                               ),
                             ),

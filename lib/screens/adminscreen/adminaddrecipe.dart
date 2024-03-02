@@ -5,13 +5,20 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 import 'package:recipe_app1/screens/adminscreen/bottomnavbaradmin.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/mytextfield.dart';
+import 'package:recipe_app1/screens/components/normalbutton.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';
 
 class AdminRecipeAdd extends StatefulWidget {
-  AdminRecipeAdd({Key? key}) : super(key: key);
+  final Map<String, dynamic>? recipeData;
+  final String? selectedCategory;
+
+  // Constructor to receive initial data for editing
+  AdminRecipeAdd({Key? key, this.recipeData, this.selectedCategory})
+      : super(key: key);
 
   @override
   _AdminRecipeAddState createState() => _AdminRecipeAddState();
@@ -25,6 +32,8 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
   List<Widget> ingredientRows = [];
   final FirestoreServices firestoreServices = FirestoreServices();
 
+  List<Map<String, TextEditingController>> ingredientsList = [];
+
   final recipeNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final ingredientController = TextEditingController();
@@ -32,7 +41,49 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
   final directionController = TextEditingController();
   final timeController = TextEditingController();
 
-  List<Map<String, TextEditingController>> ingredientsList = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // Populate fields with initial data if available (for editing)
+    if (widget.recipeData != null) {
+      fillData();
+    }
+  }
+
+  // Method to populate fields with initial data for editing
+  void fillData() {
+    // Extract data from widget.initialRecipeData and set controllers accordingly
+    recipeNameController.text = widget.recipeData!['name'] ?? '';
+    descriptionController.text = widget.recipeData!['description'] ?? '';
+    directionController.text = widget.recipeData!['direction'] ?? '';
+    timeController.text = widget.recipeData!['time'] ?? '';
+
+    selectedCategory = widget.selectedCategory;
+
+    // Set photoBase64
+    photoBase64 = widget.recipeData!['photo'] ?? '';
+
+    // Set ingredientsList
+    List<dynamic>? ingredientsData = widget.recipeData!['ingredients'];
+    ingredientsList.clear(); // Clear existing entries
+
+    if (ingredientsData != null) {
+      for (var ingredientData in ingredientsData) {
+        TextEditingController ingredientController = TextEditingController();
+        TextEditingController quantityController = TextEditingController();
+
+        ingredientController.text = ingredientData['ingredient'] ?? '';
+        quantityController.text = ingredientData['quantity'] ?? '';
+
+        ingredientsList.add({
+          'ingredient': ingredientController,
+          'quantity': quantityController,
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +151,6 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                   maxline: 1,
                   controller: recipeNameController,
                   hintText: '',
-                  
                 ),
 
                 const Text(
@@ -184,7 +234,6 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                 MyTextfield(
                   controller: descriptionController,
                   hintText: '',
-                  
                   maxline: 4,
                 ),
                 Row(
@@ -216,6 +265,7 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: ingredientsList.length,
+                  physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -225,7 +275,6 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                             child: MyTextfield(
                               controller: ingredientsList[index]['ingredient']!,
                               hintText: 'Item name',
-                              
                               maxline: 1,
                             ),
                           ),
@@ -234,7 +283,6 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                             child: MyTextfield(
                               controller: ingredientsList[index]['quantity']!,
                               hintText: 'Quantity',
-                              
                               maxline: 1,
                             ),
                           ),
@@ -282,7 +330,6 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                       child: MyTextfield(
                         controller: timeController,
                         hintText: 'hh:mm',
-                        
                         maxline: 1,
                       ),
                     )
@@ -295,15 +342,26 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                   onPressed: () async {
                     if (selectedCategory == null) {
                       // Handle the case where no category is selected
+                      _showValidationDialog('Please select a category.');
+                      return;
+                    }
+
+                    // Validate each field
+                    if (!_validateTextField(recipeNameController, 'Name') ||
+                        !_validateTextField(
+                            descriptionController, 'Description') ||
+                        !_validateIngredients() ||
+                        !_validateTextField(directionController, 'Direction') ||
+                        !_validateTextField(timeController, 'Time')) {
                       return;
                     }
 
                     // Create a map with all the data
                     Map<String, dynamic> recipeData = {
-                      'name': recipeNameController.text,
-                      'category': selectedCategory,
-                      'description': descriptionController.text,
-                      'photo': photoBase64,
+                      'name': recipeNameController.text.trim(),
+                      'category': selectedCategory!,
+                      'description': descriptionController.text.trim(),
+                      'photo': photoBase64 ?? '',
                       // Add other fields as needed
                     };
 
@@ -311,30 +369,55 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                     List<Map<String, dynamic>> ingredientsData = [];
                     for (var ingredientMap in ingredientsList) {
                       ingredientsData.add({
-                        'ingredient': ingredientMap['ingredient']!.text,
-                        'quantity': ingredientMap['quantity']!.text,
+                        'ingredient': ingredientMap['ingredient']!.text.trim(),
+                        'quantity': ingredientMap['quantity']!.text.trim(),
                       });
                     }
                     recipeData['ingredients'] = ingredientsData;
 
                     // Add direction and time to the recipeData map
-                    recipeData['direction'] = directionController.text;
-                    recipeData['time'] = timeController.text;
+                    recipeData['direction'] = directionController.text.trim();
+                    recipeData['time'] = timeController.text.trim();
 
-                    // Save the data to Firestore with the selected category
-                    await firestoreServices.addRecipe(
-                        selectedCategory!, recipeData);
-
-                    // Fetch recipe data for the selected category
-                    Map<String, dynamic> fetchedRecipeData =
-                        await firestoreServices
-                            .getRecipeData(selectedCategory!);
-
-                    // Show the success dialog or navigate to the next screen
+                    // Show Lottie animation while saving
                     showDialog(
                       context: context,
-                      builder: (context) =>
-                          customDialog(context, fetchedRecipeData),
+                      builder: (context) => AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset(
+                              'assets/lottie/Animation - 1707395406065.json',
+                              fit: BoxFit.fill,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+
+                    if (widget.recipeData != null) {
+                      // Update the existing recipe
+                      await firestoreServices.updateRecipe(
+                        selectedCategory!,
+                        widget.recipeData!['id'],
+                        recipeData,
+                      );
+                    } else {
+                      // Save a new recipe to Firestore with the selected category
+                      await firestoreServices.addRecipe(
+                          selectedCategory!, recipeData);
+                    }
+
+                    // Dismiss the Lottie animation dialog
+                    Navigator.pop(context);
+
+                    // Navigate to CustomAdminNavigationBar
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CustomAdminNavigationBar(),
+                      ),
                     );
                   },
                 ),
@@ -346,52 +429,46 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
     );
   }
 
-  Widget customDialog(BuildContext context, Map<String, dynamic> fetchedRecipeData) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      child: contentBox(context),
-    );
+  bool _validateTextField(TextEditingController controller, String fieldName) {
+    if (controller.text.trim().isEmpty) {
+      _showValidationDialog('Please enter $fieldName.');
+      return false;
+    }
+    return true;
   }
 
-  Widget contentBox(context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const Icon(
-            Icons.thumb_up_outlined,
-            color: Colors.black,
-            size: 150,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Upload sucess',
-            style: TextStyle(fontSize: 25),
-          ),
-          const Text(
-            'Your recipe has been uploaded',
-            style: TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 20),
-          MyButton(
-              text: 'Back to home',
+  bool _validateIngredients() {
+    for (var ingredientMap in ingredientsList) {
+      if (ingredientMap['ingredient']!.text.trim().isEmpty) {
+        _showValidationDialog('Please enter an item name for all ingredients.');
+        return false;
+      }
+      if (ingredientMap['quantity']!.text.trim().isEmpty) {
+        _showValidationDialog('Please enter a quantity for all ingredients.');
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void _showValidationDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Cooking....'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message),
+            const SizedBox(height: 20),
+            NormalButton(
+              text: 'OK',
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CustomAdminNavigationBar()));
-              })
-        ],
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
