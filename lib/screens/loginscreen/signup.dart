@@ -5,23 +5,33 @@ import 'package:lottie/lottie.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/mytextfield.dart';
 import 'package:recipe_app1/screens/loginscreen/signin.dart';
+import 'package:recipe_app1/screens/services/firestore.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   SignUp({super.key});
 
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
   final nameController = TextEditingController();
+
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
+
   final confirmpasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  final FirestoreServices firestoreServices = FirestoreServices();
 
-  Future addUserDetails(String fullName, String email) async {
-    await FirebaseFirestore.instance.collection('Users').add({
-      'full name': fullName,
-      'email': email,
-    });
-  }
+  // Future addUserDetails(String fullName, String email) async {
+  //   await FirebaseFirestore.instance.collection('Users').add({
+  //     'full name': fullName,
+  //     'email': email,
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -180,18 +190,22 @@ class SignUp extends StatelessWidget {
                                 email: emailController.text,
                                 password: passwordController.text,
                               );
+                              String uid =
+                                  FirebaseAuth.instance.currentUser!.uid;
+                              await firestoreServices.createUserDocument(uid,
+                                  nameController.text, emailController.text);
 
                               print('Account created');
-                              Navigator.pop(context); // Close loading indicator
+                              Navigator.pop(context);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => SignIn()));
-                              addUserDetails(
+                              await firestoreServices.addUserDetails(
                                   nameController.text, emailController.text);
                             } else {
                               // Passwords do not match, show an error
-                              Navigator.pop(context); // Close loading indicator
+                              Navigator.pop(context);
                               showDialog(
                                 context: context,
                                 builder: (context) {

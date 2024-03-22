@@ -80,7 +80,7 @@ class RecipeDetailsPage extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         '$description',
-                        style: CustomWidget.heading3(context),
+                        style: CustomWidget.heading6(context),
                       ),
                       const SizedBox(height: 10),
                       Container(

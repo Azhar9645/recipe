@@ -1,7 +1,41 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future addUserDetails(String fullName, String email) async {
+    await FirebaseFirestore.instance.collection('Users').add({
+      'full name': fullName,
+      'email': email,
+    });
+  }
+
+  Future<void> createUserDocument(
+      String uid, String fullName, String email) async {
+    await _firestore.collection('Users').doc(uid).set({
+      'full name': fullName,
+      'email': email,
+    });
+  }
+
+  Future<Map<String, dynamic>?> getUserData(String uid) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Users').doc(uid).get();
+
+      if (snapshot.exists) {
+        return snapshot.data();
+      } else {
+        print("Document does not exist for UID: $uid");
+        return null;
+      }
+    } catch (error) {
+      print("Error fetching user data: $error");
+      return null;
+    }
+  }
 
   final CollectionReference category =
       FirebaseFirestore.instance.collection('category');
@@ -34,23 +68,30 @@ class FirestoreServices {
   }
 
   Future<void> addRecipe(
-      String selectedCategory, Map<String, dynamic> recipeData) async {
+    String selectedCategory,
+    Map<String, dynamic> recipeData,
+  ) async {
+    if (selectedCategory == null) {
+      print("Selected category is null. Unable to add recipe.");
+      return;
+    }
+
     try {
-      if (selectedCategory == null) {
-        // Handle the case where selectedCategory is null
-        print("Selected category is null. Unable to add recipe.");
-        return;
-      }
+      String docID = recipes.doc().id;
 
-      // Create a reference to the 'recipes' collection under the selected category
-      CollectionReference categoryRecipes =
-          recipes.doc(selectedCategory).collection('recipes');
+      await recipes
+          .doc(selectedCategory)
+          .collection('recipes')
+          .doc(docID)
+          .set(recipeData);
 
-      // Add the recipe data to the 'recipes' collection under the selected category
-      await categoryRecipes.add(recipeData);
+      await recipes
+          .doc('All')
+          .collection('recipes')
+          .doc(docID)
+          .set(recipeData);
     } catch (error) {
       print("Error adding recipe to Firestore: $error");
-      // Handle the error as needed
     }
   }
 
@@ -64,20 +105,15 @@ class FirestoreServices {
 
       CollectionReference categoryRecipes =
           recipes.doc(selectedCategory).collection('recipes');
-
       QuerySnapshot snapshot = await categoryRecipes.get();
 
       if (snapshot.docs.isNotEmpty) {
-        List<Map<String, dynamic>> recipesList =
-            snapshot.docs.map((DocumentSnapshot document) {
-          // Include the document ID in the recipe data
-          Map<String, dynamic> recipeData =
-              document.data() as Map<String, dynamic>;
-          recipeData['id'] = document.id;
-          return recipeData;
+        return snapshot.docs.map((DocumentSnapshot document) {
+          return {
+            ...document.data() as Map<String, dynamic>,
+            'id': document.id
+          };
         }).toList();
-
-        return recipesList;
       } else {
         print("No recipe data found for category: $selectedCategory");
         return null;
@@ -90,14 +126,20 @@ class FirestoreServices {
 
   Future<void> deleteRecipe(String selectedCategory, String docID) async {
     try {
-      // Replace "WorkoutList" with the appropriate collection for your categories
       await FirebaseFirestore.instance
-          .collection(
-              'recipes') // Adjust collection name based on your data structure
+          .collection('recipes')
           .doc(selectedCategory)
           .collection('recipes')
           .doc(docID)
           .delete();
+
+      await FirebaseFirestore.instance
+          .collection('recipes')
+          .doc('All')
+          .collection('recipes')
+          .doc(docID)
+          .delete();
+
       print('Recipe deleted: $docID');
     } catch (error) {
       print('Error deleting recipe: $error');
@@ -108,7 +150,6 @@ class FirestoreServices {
       Map<String, dynamic> updatedRecipeData) async {
     try {
       if (selectedCategory == null || docID == null) {
-        // Handle the case where selectedCategory or docID is null
         print("Selected category or docID is null. Unable to update recipe.");
         return;
       }
@@ -121,48 +162,45 @@ class FirestoreServices {
       await categoryRecipes.doc(docID).update(updatedRecipeData);
     } catch (error) {
       print("Error updating recipe in Firestore: $error");
-      // Handle the error as needed
     }
   }
 
-  Stream<QuerySnapshot> getRecipesStream(String selectedCategory) {
-    print('Selected Category: $selectedCategory');
+  Stream<List<Map<String, dynamic>>> getRecipeStream(String selectedCategory) {
+    try {
+      if (selectedCategory == null) {
+        print("Selected category is null. Unable to create recipe stream.");
+        return Stream.value([]);
+      }
 
-    final categoryRecipesStream = recipes
-        .doc(selectedCategory)
-        .collection('recipes')
-        .orderBy('timestamp', descending: true)
-        .snapshots();
-    return categoryRecipesStream;
+      // Create a reference to the 'recipes' collection under the selected category
+      CollectionReference categoryRecipes = FirebaseFirestore.instance
+          .collection('recipes')
+          .doc(selectedCategory)
+          .collection('recipes');
+
+      // Create and return the stream
+      return categoryRecipes.snapshots().map((QuerySnapshot snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          List<Map<String, dynamic>> recipesList =
+              snapshot.docs.map((DocumentSnapshot document) {
+            // Include the document ID in the recipe data
+            Map<String, dynamic> recipeData =
+                document.data() as Map<String, dynamic>;
+            recipeData['id'] = document.id;
+            return recipeData;
+          }).toList();
+
+          return recipesList;
+        } else {
+          print("No recipe data found for category: $selectedCategory");
+          return [];
+        }
+      });
+    } catch (error) {
+      print("Error creating recipe stream from Firestore: $error");
+      return Stream.value([]);
+    }
   }
 
-// Future<List<Map<String, dynamic>>?> fetchRecipesByCategory(String? selectedCategory) async {
-//     try {
-//       if (selectedCategory == null) {
-//         print("Selected category is null. Unable to fetch recipes.");
-//         return null;
-//       }
-
-//       CollectionReference categoryRecipes = recipes.doc(selectedCategory).collection('recipes');
-
-//       QuerySnapshot snapshot = await categoryRecipes.get();
-
-//       if (snapshot.docs.isNotEmpty) {
-//         List<Map<String, dynamic>> recipesList = snapshot.docs.map((DocumentSnapshot document) {
-//           // Include the document ID in the recipe data
-//           Map<String, dynamic> recipeData = document.data() as Map<String, dynamic>;
-//           recipeData['id'] = document.id;
-//           return recipeData;
-//         }).toList();
-
-//         return recipesList;
-//       } else {
-//         print("No recipes found for category: $selectedCategory");
-//         return null;
-//       }
-//     } catch (error) {
-//       print("Error fetching recipes from Firestore: $error");
-//       return null;
-//     }
-//   }
+  
 }

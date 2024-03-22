@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/adminscreen/categorypage.dart';
+import 'package:recipe_app1/screens/adminscreen/function_category_add.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/mytextfield.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';
@@ -66,6 +67,7 @@ class _CategoryAddState extends State<CategoryAdd> {
 
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) => GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
@@ -212,18 +214,14 @@ class _CategoryAddState extends State<CategoryAdd> {
                       ),
                       child: ListTile(
                         onTap: () async {
-                          // Store the required data before entering the asynchronous block
                           String selectedCategoryText = categoryText;
 
-                          // Fetch recipe data for the selected category
                           List<Map<String, dynamic>>? recipeDataList =
                               await firestoreServices
                                   .getRecipeData(selectedCategoryText);
 
-                          // Check if recipeDataList is not null and not empty
                           if (recipeDataList != null &&
                               recipeDataList.isNotEmpty) {
-                            // Capture the context after the asynchronous block
                             BuildContext contextAfterAsync = context;
 
                             Navigator.push(

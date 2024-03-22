@@ -1,43 +1,49 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/adminscreen/admin_recipe_details.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';
 
-class CategoryPage extends StatelessWidget {
+class CategoryPage extends StatefulWidget {
   final String categoryName;
 
   final List<Map<String, dynamic>?> recipes;
   CategoryPage({required this.categoryName, required this.recipes});
 
+  @override
+  State<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
   // Change the type to allow null
   final FirestoreServices firestoreServices = FirestoreServices();
 
   @override
   Widget build(BuildContext context) {
-    print('Number of recipes: ${recipes.length}'); // Debug print
-    String selectedCategory = categoryName;
+    print('Number of recipes: ${widget.recipes.length}'); // Debug print
+    String selectedCategory = widget.categoryName;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(categoryName),
+        title: Text(widget.categoryName),
       ),
       body: Padding(
         padding: const EdgeInsets.all(18.0),
-        child: recipes.isEmpty
+        child: widget.recipes.isEmpty
             ? Center(
-                child: Text('No recipes found for $categoryName'),
+                child: Text('No recipes found for ${widget.categoryName}'),
               )
             : ListView.builder(
-                itemCount: recipes.length,
+                itemCount: widget.recipes.length,
                 itemBuilder: (context, index) {
-                  Map<String, dynamic>? recipe = recipes[index]; // Allow null
+                  Map<String, dynamic>? recipe =
+                      widget.recipes[index]; // Allow null
                   if (recipe == null) {
                     return const SizedBox.shrink(); // or handle null case
                   }
-                  String recipeName = recipe['name'] ?? 'Unnamed Recipe';
+                  String recipeName =
+                      recipe['name'] as String? ?? 'Unnamed Recipe';
                   String time = recipe['time'] ?? 'N/A';
                   String base64Image = recipe['photo'] ?? '';
 
@@ -49,8 +55,9 @@ class CategoryPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              RecipeDetailsPage(recipeData: recipe,selectedCategory:categoryName),
+                          builder: (context) => RecipeDetailsPage(
+                              recipeData: recipe,
+                              selectedCategory: widget.categoryName),
                         ),
                       );
                     },
@@ -121,9 +128,13 @@ class CategoryPage extends StatelessWidget {
                                     print('Document ID to delete: $docID');
                                     if (docID != null) {
                                       await showDeleteConfirmationDialog(
-                                          context, selectedCategory, docID);
-                                      print(
-                                          'Selected Category: $selectedCategory');
+                                          context, selectedCategory, docID, () {
+                                        // Callback function to trigger a rebuild of the UI
+                                        setState(() {
+                                          widget.recipes.removeWhere((recipe) =>
+                                              recipe?['id'] == docID);
+                                        });
+                                      });
                                     } else {
                                       print(
                                           "Document ID is null. Unable to delete recipe.");
@@ -145,14 +156,15 @@ class CategoryPage extends StatelessWidget {
     );
   }
 
-  showDeleteConfirmationDialog(
-      BuildContext context, String selectedCategory, String docID) {
+  showDeleteConfirmationDialog(BuildContext context, String selectedCategory,
+      String docID, Function() onDeleted) {
     showDialog(
       context: context,
+      barrierDismissible: true, 
       builder: (context) => AlertDialog(
         title: const Text('Are you sure?'),
         content: Text(
-          'You want to delete the recipe with ID "$docID" from category "$selectedCategory"?',
+          'You want to delete the recipe in "$selectedCategory"?',
         ),
         actions: [
           Column(
@@ -172,6 +184,10 @@ class CategoryPage extends StatelessWidget {
                         content: const Text('Recipe deleted successfully!'),
                       ),
                     );
+
+                    // Trigger the callback to rebuild the UI
+                    onDeleted();
+
                     print(
                         "After calling deleteRecipeById. Selected category: $selectedCategory");
                   } catch (error) {

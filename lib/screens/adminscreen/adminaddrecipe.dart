@@ -43,18 +43,14 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    // Populate fields with initial data if available (for editing)
     if (widget.recipeData != null) {
       fillData();
     }
   }
 
-  // Method to populate fields with initial data for editing
   void fillData() {
-    // Extract data from widget.initialRecipeData and set controllers accordingly
     recipeNameController.text = widget.recipeData!['name'] ?? '';
     descriptionController.text = widget.recipeData!['description'] ?? '';
     directionController.text = widget.recipeData!['direction'] ?? '';
@@ -62,12 +58,10 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
 
     selectedCategory = widget.selectedCategory;
 
-    // Set photoBase64
     photoBase64 = widget.recipeData!['photo'] ?? '';
 
-    // Set ingredientsList
     List<dynamic>? ingredientsData = widget.recipeData!['ingredients'];
-    ingredientsList.clear(); // Clear existing entries
+    ingredientsList.clear();
 
     if (ingredientsData != null) {
       for (var ingredientData in ingredientsData) {
@@ -302,6 +296,7 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                     );
                   },
                 ),
+
                 const Text(
                   'Direction',
                   style: TextStyle(
@@ -379,7 +374,7 @@ class _AdminRecipeAddState extends State<AdminRecipeAdd> {
                     recipeData['direction'] = directionController.text.trim();
                     recipeData['time'] = timeController.text.trim();
 
-                    // Show Lottie animation while saving
+                    // Lottie animation
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
