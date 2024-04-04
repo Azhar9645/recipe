@@ -1,8 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:recipe_app1/main.dart';
+import 'package:recipe_app1/screens/components/bottomnavigationbar.dart';
 import 'package:recipe_app1/screens/loginscreen/signin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Splash extends StatelessWidget {
-  const Splash({super.key});
+class Splash extends StatefulWidget {
+  const Splash({Key? key}) : super(key: key);
+
+  @override
+  _SplashState createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  @override
+  void initState() {
+    super.initState();
+    checkUserLogin();
+  }
+
+  Future<void> checkUserLogin() async {
+    final SharedPreferences _sharedPrefs = await SharedPreferences.getInstance();
+    final bool? _userLoggedIn = _sharedPrefs.getBool(SAVE_KEY);
+    if (_userLoggedIn == null || _userLoggedIn == false) {
+      Splash();
+    } else {
+      CustomCurvedNavigationBar();
+    }
+  }
+
+  void gotoLogin() {
+    // Implement your navigation logic to go to the login screen here
+    // For example:
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => SignIn()),
+    );
+  }
+
+  void goToHome() {
+    // Implement your navigation logic to go to the home screen here
+    // For example:
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => CustomCurvedNavigationBar()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +98,7 @@ class Splash extends StatelessWidget {
               width: 250,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>SignIn()));
+                  gotoLogin();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFE23E3E),

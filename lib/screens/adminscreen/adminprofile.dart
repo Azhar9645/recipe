@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/adminscreen/bottomnavbaradmin.dart';
+import 'package:recipe_app1/screens/adminscreen/total_user_admin.dart';
 import 'package:recipe_app1/screens/components/color.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
@@ -14,7 +15,6 @@ class AdminProfile extends StatefulWidget {
 }
 
 class _AdminProfileState extends State<AdminProfile> {
-  
   void showLogoutConfirmationDialog() {
     showDialog(
       context: context,
@@ -28,7 +28,7 @@ class _AdminProfileState extends State<AdminProfile> {
               Navigator.pop(context); // Close the dialog
             },
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           SizedBox(
@@ -40,7 +40,7 @@ class _AdminProfileState extends State<AdminProfile> {
 
               // Show a Snackbar indicating successful logout
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('Logged out successfully!'),
                 ),
               );
@@ -64,7 +64,7 @@ class _AdminProfileState extends State<AdminProfile> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Row(
@@ -84,6 +84,43 @@ class _AdminProfileState extends State<AdminProfile> {
                   },
                 )
               ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {},
+                  child: const CircleAvatar(
+                    radius: 50,
+                  ),
+                ),
+                CustomWidget.customButton(context, 'Edit profile', () {}),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>TotalUsers()));
+              },
+              child: Container(
+                width: 350,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Color(0xFFE23E3E)),
+                  
+                ),
+                child: Center(
+                  child: Text(
+                    'Total Users',
+                    style: CustomWidget.heading31(context),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

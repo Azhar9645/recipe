@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:recipe_app1/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe_app1/screens/adminscreen/bottomnavbaradmin.dart';
 import 'package:recipe_app1/screens/components/bottomnavigationbar.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
@@ -8,16 +10,13 @@ import 'package:recipe_app1/screens/loginscreen/resetpassword.dart';
 import 'package:recipe_app1/screens/loginscreen/signup.dart';
 
 class SignIn extends StatelessWidget {
-  SignIn({super.key});
+  SignIn({Key? key}) : super(key: key);
 
   final String adminemail = 'asru@gmail.com';
-
   final String adminepass = 'Azhar@0000';
 
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,16 +31,12 @@ class SignIn extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(
-                  height: 70,
-                ),
+                const SizedBox(height: 70),
                 Image.asset(
                   'assets/logo/reciperover-high-resolution-logo-transparent.png',
                   width: 200,
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -49,9 +44,7 @@ class SignIn extends StatelessWidget {
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 MyTextfield(
                   controller: emailController,
                   hintText: 'abc@email.com',
@@ -61,8 +54,8 @@ class SignIn extends StatelessWidget {
                       return 'Email is required';
                     }
                     if (!RegExp(
-                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                        .hasMatch(value)) {
+                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                    ).hasMatch(value)) {
                       return 'Enter a valid Gmail address';
                     }
                     return null;
@@ -82,9 +75,6 @@ class SignIn extends StatelessWidget {
                     if (!value.contains(RegExp(r'[A-Z]'))) {
                       return 'Password must contain at least one uppercase letter';
                     }
-                    if (!value.contains(RegExp(r'[A-Z]'))) {
-                      return 'Password must contain at least one uppercase letter';
-                    }
                     if (!value.contains(RegExp(r'[^\w]'))) {
                       return 'Password must contain at least one non-alphabetic character';
                     }
@@ -94,19 +84,21 @@ class SignIn extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ForgotPassword()));
-                      },
-                      child: const Text(
-                        'Forgot password?',
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400),
-                      )),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPassword()),
+                      );
+                    },
+                    child: const Text(
+                      'Forgot password?',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
                 ),
                 Container(
                   width: 250,
@@ -116,11 +108,11 @@ class SignIn extends StatelessWidget {
                       if (_formKey.currentState!.validate()) {
                         if (emailController.text == adminemail &&
                             passwordController.text == adminepass) {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    CustomAdminNavigationBar()),
+                              builder: (context) => CustomAdminNavigationBar(),
+                            ),
                           );
                         } else {
                           FirebaseAuth.instance
@@ -129,12 +121,13 @@ class SignIn extends StatelessWidget {
                             password: passwordController.text,
                           )
                               .then(
-                            (value) {
-                              Navigator.push(
+                            (value) async {
+                              final _sharedPrefs = await SharedPreferences.getInstance();
+                              await _sharedPrefs.setBool(SAVE_KEY, true);
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      CustomCurvedNavigationBar(),
+                                  builder: (context) => CustomCurvedNavigationBar(),
                                 ),
                               );
                             },
@@ -148,16 +141,12 @@ class SignIn extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 const Text(
                   'OR',
                   style: TextStyle(fontSize: 16),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -166,21 +155,23 @@ class SignIn extends StatelessWidget {
                       style: TextStyle(fontSize: 16, color: Colors.black),
                     ),
                     TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignUp()));
-                        },
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFE23E3E)),
-                        )),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignUp()),
+                        );
+                      },
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFE23E3E),
+                        ),
+                      ),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
           ),

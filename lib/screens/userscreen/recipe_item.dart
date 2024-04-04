@@ -21,20 +21,30 @@ class RecipeDetails extends StatefulWidget {
 class _RecipeDetailsState extends State<RecipeDetails> {
   bool isFavorite = false;
 
+ 
+
+
  void _toggleFavorite() async {
   setState(() {
     isFavorite = !isFavorite;
   });
 
-  if (isFavorite) {
-    final favRecipe = FavRecipe(
-      recipeName: widget.recipeName,
-      recipeData: widget.recipeData,
-    );
+  final favRecipe = FavRecipe(
+    recipeName: widget.recipeName,
+    recipeData: widget.recipeData,
+  );
+
+  // Check if the recipe with the same ID already exists in the favorites list
+  final existingRecipe = await HiveService.getFavRecipeById(widget.recipeData['id']);
+
+  if (isFavorite && existingRecipe == null) {
     await HiveService.addFavRecipe(favRecipe);
-  } else {
- await HiveService.removeFavRecipeById(widget.recipeData['id']);   }
+  } else if (!isFavorite && existingRecipe != null) {
+    await HiveService.removeFavRecipeById(widget.recipeData['id']);
+  }
 }
+
+
 
 
   @override

@@ -15,6 +15,9 @@ import 'package:recipe_app1/screens/userscreen/profile.dart';
 import 'package:recipe_app1/screens/userscreen/wishlist.dart';
 import 'firebase_options.dart';
 
+const SAVE_KEY = 'UserLogin';
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -26,6 +29,9 @@ Future<void> main() async {
     await Hive.openBox<UserRecipe>('recipe_db');
 
   Hive.registerAdapter(FavRecipeAdapter());
+
+  Hive.registerAdapter(CartIngredientsAdapter());
+  await Hive.openBox<CartIngredients>('cart_recipe');
   
 
   await Firebase.initializeApp(

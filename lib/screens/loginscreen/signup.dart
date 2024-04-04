@@ -24,15 +24,10 @@ class _SignUpState extends State<SignUp> {
   final confirmpasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
   final FirestoreServices firestoreServices = FirestoreServices();
 
   // Future addUserDetails(String fullName, String email) async {
-  //   await FirebaseFirestore.instance.collection('Users').add({
-  //     'full name': fullName,
-  //     'email': email,
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

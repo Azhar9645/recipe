@@ -13,7 +13,7 @@ import androidx.annotation.CallSuper;
 import androidx.multidex.MultiDex;
 
 /**
- * Extension of {@link android.app.Application}, adding multidex support.
+ * Extension of {@link android.app.Application}, adding multidex suppotr.
  */
 public class FlutterMultiDexApplication extends Application {
   @Override

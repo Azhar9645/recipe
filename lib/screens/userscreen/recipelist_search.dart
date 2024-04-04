@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
 import 'package:recipe_app1/screens/userscreen/recipe_details.dart';
+import 'package:recipe_app1/screens/userscreen/recipe_item.dart';
 
 class RecipeListItem extends StatelessWidget {
   final String recipeName;
@@ -17,15 +18,15 @@ class RecipeListItem extends StatelessWidget {
 
     return ListTile(
       onTap: () {
-        
+        Navigator.push(context, MaterialPageRoute(builder: (content)=>RecipeDetails(recipeName: recipeName, recipeData: recipeData)));
       },
-      contentPadding: const EdgeInsets.all(8),
+      contentPadding: const EdgeInsets.only(left: 18,right: 18),
       leading: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: Image.memory(
           base64.decode(photoBase64),
-          height: 60.0,
-          width: 60.0,
+          height: 70.0,
+          width: 70.0,
           fit: BoxFit.cover,
         ),
       ),
@@ -33,19 +34,13 @@ class RecipeListItem extends StatelessWidget {
         recipeName,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 12.0, color: Colors.grey),
+        style: TextStyle(fontSize: 14.0, color: Colors.grey),
       ),
       subtitle: Text(
         'Time: $recipeTime',
-        style: TextStyle(fontSize: 12.0, color: Colors.grey),
+        style: TextStyle(fontSize: 14.0, color: Colors.grey),
       ),
-      trailing: IconButton(
-        icon: Icon(Icons.favorite),
-        onPressed: () {
-          // Handle favorite button tap
-        },
-        color: Colors.red, // Adjust the color as needed
-      ),
+      
     );
   }
 }

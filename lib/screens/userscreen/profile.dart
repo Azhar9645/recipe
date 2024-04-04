@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,15 +7,20 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:recipe_app1/screens/Hive/data_model.dart';
 import 'package:recipe_app1/screens/Hive/function.dart';
+import 'package:recipe_app1/screens/components/drawer.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
 import 'package:recipe_app1/screens/loginscreen/signin.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';
+import 'package:recipe_app1/screens/userscreen/edit_profile.dart';
 import 'package:recipe_app1/screens/userscreen/recipe_details.dart';
 import 'package:recipe_app1/screens/userscreen/user_add_recipe_details.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+  Profile({Key? key}) : super(key: key);
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -25,6 +31,11 @@ class _ProfileState extends State<Profile> {
   Map<String, dynamic>? userData;
   File? profilePhoto;
   late ValueNotifier<List<UserRecipe>> recipeListNotifier;
+  String recipeBoxName = 'recipe_db';
+
+  String? photoBase64;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -54,18 +65,21 @@ class _ProfileState extends State<Profile> {
       } catch (error) {
         print("Error fetching user data: $error");
       }
+    } else {
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      endDrawer: MyDrawer(userData: userData),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             SizedBox(
-              height: 20,
+              height: 15,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,13 +88,13 @@ class _ProfileState extends State<Profile> {
                   'My profile',
                   style: CustomWidget.heading2(context),
                 ),
-                
                 IconButton(
-                  icon: const Icon(
-                    Icons.exit_to_app,
+                  icon: Icon(
+                    Icons.menu,
+                    color: Color(0xFFE23E3E),
                   ),
                   onPressed: () {
-                    showLogoutConfirmationDialog();
+                    _scaffoldKey.currentState?.openEndDrawer();
                   },
                 ),
               ],
@@ -89,24 +103,35 @@ class _ProfileState extends State<Profile> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: () {
-                    _getImage(context: context);
-                  },
-                  child: CircleAvatar(
-                    radius: 50,
+                  onTap: () {},
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(60),
+                    child: userData != null && userData!['photo'] != null
+                        ? Image.memory(
+                            base64Decode(userData!['photo']),
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          )
+                        : Placeholder(
+                            fallbackWidth: 120,
+                            fallbackHeight: 120,
+                          ),
                   ),
                 ),
-                CustomWidget.customButton(context, 'Edit profile', () {}),
               ],
             ),
             if (userData != null)
               Column(
                 children: [
                   ListTile(
-                    title: Text('${userData!['full name'] ?? 'N/A'}'),
+                    title: Text(
+                      '${userData!['full name'] ?? 'N/A'}',
+                      style: CustomWidget.heading32(context),
+                    ),
                   ),
                   ListTile(
-                    title: Text('${userData!['email'] ?? 'N/A'}'),
+                    title: Text('${userData!['description'] ?? 'N/A'}'),
                   ),
                 ],
               ),
@@ -121,11 +146,12 @@ class _ProfileState extends State<Profile> {
                       final recipe = recipes[index];
                       return GestureDetector(
                         onTap: () {
+                          print('Tapped recipe index: $index');
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  UserAddRecipe(recipe: recipe),
+                              builder: (context) => UserAddRecipe(
+                                  recipe: recipe, recipeIndex: index),
                             ),
                           );
                         },
@@ -190,7 +216,9 @@ class _ProfileState extends State<Profile> {
                                         ),
                                       ),
                                       IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          _deleteRecipe(recipe);
+                                        },
                                         icon: const Icon(
                                           Icons.delete_outline,
                                           color: Colors.white,
@@ -215,57 +243,46 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void showLogoutConfirmationDialog() {
+  void _deleteRecipe(UserRecipe recipe) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Oh no! You are leaving . . . .'),
-        content: const Text('Are you sure?'),
+        title: Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete ${recipe.name}?'),
         actions: [
-          NormalButton(
-            text: 'Naah, just kidding',
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          SizedBox(
-            width: double.infinity,
-            child:
-                CustomWidget.customButton(context, 'Yes,log Me Out', () async {
-              // Perform the logout if the user confirms
-              await FirebaseAuth.instance.signOut();
-
-              // Show a Snackbar indicating successful logout
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logged out successfully!'),
-                ),
-              );
-
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => SignIn()),
-                (Route<dynamic> route) => false,
-              );
-            }),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              NormalButton(
+                text: 'Yes',
+                onPressed: () async {
+                  final recipeBox =
+                      await Hive.openBox<UserRecipe>(recipeBoxName);
+                  final index = recipeBox.values.toList().indexOf(recipe);
+                  if (index != -1) {
+                    await HiveService.deleteRecipe(index);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Recipe deleted successfully!'),
+                      ),
+                    );
+                  }
+                  print(index);
+                  Navigator.of(context).pop();
+                },
+              ),
+              SizedBox(height: 10),
+              NormalButton(
+                text: 'No',
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _getImage({required BuildContext context}) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
-
-    print("Image Path: ${pickedFile.path}");
-
-    setState(() {
-      profilePhoto = File(pickedFile.path);
-    });
   }
 }

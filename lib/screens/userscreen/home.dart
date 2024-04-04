@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:recipe_app1/screens/components/loading.dart';
+import 'package:recipe_app1/screens/components/shimmer_home.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';
 import 'package:recipe_app1/screens/userscreen/recipe_item.dart';
@@ -164,99 +167,109 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 15),
             Expanded(
               child: isSearching
-                  ? ListView.builder(
-                      itemCount: filteredRecipesList.length,
-                      itemBuilder: (context, index) {
-                        final recipeData = filteredRecipesList[index];
-                        final recipeName = recipeData['name'] ?? 'Unknown';
-
-                        return RecipeListItem(
-                          recipeData: recipeData,
-                          recipeName: '$recipeName',
-                          recipeTime: recipeData['time'] ?? 'Unknown',
-                        );
-                      },
-                    )
+                  ? _buildSearchResults()
                   : selectedCategory == 'All' && allRecipesList.isNotEmpty
-                      ? CarouselSlider.builder(
-                          itemCount: allRecipesList.length,
-                          options: CarouselOptions(
-                            height: 500,
-                            aspectRatio: 1 / 1.4,
-                            viewportFraction: 0.75,
-                            initialPage: 0,
-                            enableInfiniteScroll: true,
-                            reverse: false,
-                            autoPlay: true,
-                            autoPlayInterval: Duration(seconds: 3),
-                            autoPlayAnimationDuration:
-                                Duration(milliseconds: 800),
-                            autoPlayCurve: Curves.fastOutSlowIn,
-                            enlargeCenterPage: true,
-                            scrollDirection: Axis.horizontal,
-                          ),
-                          itemBuilder: (context, index, realIndex) {
-                            final recipeData = allRecipesList[index];
-                            final recipeName = recipeData['name'] ?? 'Unknown';
-
-                            return RecipeDetails(
-                              recipeData: recipeData,
-                              recipeName: '$recipeName',
-                            );
-                          },
-                        )
-                      : StreamBuilder<List<Map<String, dynamic>>>(
-                          stream: firestoreServices
-                              .getRecipeStream(selectedCategory),
-                          builder: (context,
-                              AsyncSnapshot<List<Map<String, dynamic>>>
-                                  snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-
-                            if (snapshot.hasError) {
-                              return Text('Error: ${snapshot.error}');
-                            }
-
-                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Text(
-                                  'No recipes found for the selected category.');
-                            }
-
-                            print('Retrieved Data: ${snapshot.data}');
-
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 15, right: 15),
-                              child: GridView.builder(
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 5.0,
-                                  mainAxisSpacing: 5.0,
-                                  childAspectRatio: 0.9,
-                                ),
-                                itemCount: snapshot.data!.length,
-                                itemBuilder: (context, index) {
-                                  final recipeData = snapshot.data![index];
-                                  final recipeName =
-                                      recipeData['name'] ?? 'Unknown';
-
-                                  return RecipeDetails(
-                                    recipeData: recipeData,
-                                    recipeName: '$recipeName',
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-            ),
+                      ? _buildPopularCarousel()
+                      : _buildCategoryGrid(),
+            )
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return filteredRecipesList.isEmpty
+        ? Center(
+            child: Text('No recipes found.'),
+          )
+        : ListView.builder(
+            itemCount: filteredRecipesList.length,
+            itemBuilder: (context, index) {
+              final recipeData = filteredRecipesList[index];
+              final recipeName = recipeData['name'] ?? 'Unknown';
+
+              return RecipeListItem(
+                recipeData: recipeData,
+                recipeName: '$recipeName',
+                recipeTime: recipeData['time'] ?? 'Unknown',
+              );
+            },
+          );
+  }
+
+  Widget _buildPopularCarousel() {
+    return CarouselSlider.builder(
+      itemCount: allRecipesList.length,
+      options: CarouselOptions(
+        height: 500,
+        aspectRatio: 1 / 1.4,
+        viewportFraction: 0.75,
+        initialPage: 0,
+        enableInfiniteScroll: true,
+        reverse: false,
+        autoPlay: true,
+        autoPlayInterval: Duration(seconds: 3),
+        autoPlayAnimationDuration: Duration(milliseconds: 800),
+        autoPlayCurve: Curves.fastOutSlowIn,
+        enlargeCenterPage: true,
+        scrollDirection: Axis.horizontal,
+      ),
+      itemBuilder: (context, index, realIndex) {
+        final recipeData = allRecipesList[index];
+        final recipeName = recipeData['name'] ?? 'Unknown';
+
+        return RecipeDetails(
+          recipeData: recipeData,
+          recipeName: '$recipeName',
+        );
+      },
+    );
+  }
+
+  Widget _buildCategoryGrid() {
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: firestoreServices.getRecipeStream(selectedCategory),
+      builder: (context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: ShimmerGrid(itemCount: 10, crossAxisCount: 2),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Text('No recipes found for the selected category.');
+        }
+
+        print('Retrieved Data: ${snapshot.data}');
+
+        return Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 5.0,
+              mainAxisSpacing: 5.0,
+              childAspectRatio: 0.9,
+            ),
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final recipeData = snapshot.data![index];
+              final recipeName = recipeData['name'] ?? 'Unknown';
+
+              return RecipeDetails(
+                recipeData: recipeData,
+                recipeName: '$recipeName',
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

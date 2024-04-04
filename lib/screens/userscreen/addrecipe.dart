@@ -11,7 +11,8 @@ import '../Hive/data_model.dart';
 
 class AddRecipe extends StatefulWidget {
   final recipe;
-  AddRecipe({super.key, this.recipe});
+  final int? recipeIndex;
+  AddRecipe({super.key, this.recipe, this.recipeIndex});
 
   @override
   State<AddRecipe> createState() => _AddRecipeState();
@@ -30,6 +31,41 @@ class _AddRecipeState extends State<AddRecipe> {
   final quantityController = TextEditingController();
   final directionController = TextEditingController();
   final timeController = TextEditingController();
+
+  bool get isEditMode => widget.recipe != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.recipe != null) {
+      // Populate the fields with existing recipe details
+      recipeNameController.text = widget.recipe.name;
+      descriptionController.text = widget.recipe.description;
+      directionController.text = widget.recipe.direction;
+      timeController.text = widget.recipe.time;
+      // If there are ingredients, populate them as well
+      if (widget.recipe.ingredients != null) {
+        for (var ingredient in widget.recipe.ingredients!) {
+          TextEditingController ingredientController = TextEditingController();
+          TextEditingController quantityController = TextEditingController();
+          ingredientController.text = ingredient['name'] ?? '';
+          quantityController.text = ingredient['quantity'] ?? '';
+          ingredientsList.add({
+            'ingredient': ingredientController,
+            'quantity': quantityController,
+          });
+        }
+      }
+      // If the recipe contains an image path, display the image
+      if (widget.recipe != null &&
+          widget.recipe.imagePath != null &&
+          widget.recipe.imagePath.isNotEmpty) {
+        setState(() {
+          photo = File(widget.recipe.imagePath);
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,67 +249,8 @@ class _AddRecipeState extends State<AddRecipe> {
               ),
               const SizedBox(height: 15),
               MyButton(
-                text: 'Save my recipe',
-                onPressed: () async {
-                  // Create a list to hold the ingredients with their quantities
-                  List<Map<String, String>> ingredientsWithQuantities = [];
-
-                  // Iterate through each ingredient in the ingredientsList and add it to the list
-                  for (var ingredient in ingredientsList) {
-                    // Extract the name and quantity from the text controllers
-                    String ingredientName = ingredient['ingredient']!.text;
-                    String ingredientQuantity = ingredient['quantity']!.text;
-
-                    // Create a map to hold the ingredient name and quantity
-                    Map<String, String> ingredientMap = {
-                      'name': ingredientName,
-                      'quantity': ingredientQuantity,
-                    };
-
-                    // Add the ingredient map to the list
-                    ingredientsWithQuantities.add(ingredientMap);
-                  }
-
-                  // Create a UserRecipe object with the entered details
-                  UserRecipe recipe = UserRecipe(
-                    name: recipeNameController.text,
-                    description: descriptionController.text,
-                    ingredients: ingredientsWithQuantities,
-                    direction: directionController.text,
-                    time: timeController.text,
-                    imagePath: photo != null
-                        ? photo!.path
-                        : '', // Path to the image if available
-                  );
-
-                  // Print the recipe data before saving
-                  print('Recipe Data Before Saving:');
-                  print('Name: ${recipe.name}');
-                  print('Description: ${recipe.description}');
-                  print('Ingredients: ${recipe.ingredients}');
-                  print('Direction: ${recipe.direction}');
-                  print('Time: ${recipe.time}');
-                  print('Image Path: ${recipe.imagePath}');
-
-                  // Save the recipe
-                  await HiveService.saveRecipe(recipe);
-
-                  // Print the recipe data after saving
-                  print('Recipe Data After Saving:');
-                  print('Name: ${recipe.name}');
-                  print('Description: ${recipe.description}');
-                  print('Ingredients: ${recipe.ingredients}');
-                  print('Direction: ${recipe.direction}');
-                  print('Time: ${recipe.time}');
-                  print('Image Path: ${recipe.imagePath}');
-
-                  // Navigate to another screen (for example, RecipeListScreen)
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CustomCurvedNavigationBar()),
-                  );
-                },
+                text: widget.recipe != null ? 'Update' : 'Save my recipe',
+                onPressed: _saveOrUpdateRecipe,
               ),
             ],
           ),
@@ -281,6 +258,50 @@ class _AddRecipeState extends State<AddRecipe> {
       ),
     );
   }
+
+ Future<void> _saveOrUpdateRecipe() async {
+  List<Map<String, String>> ingredientsWithQuantities = [];
+
+  for (var ingredient in ingredientsList) {
+    String ingredientName = ingredient['ingredient']!.text;
+    String ingredientQuantity = ingredient['quantity']!.text;
+
+    Map<String, String> ingredientMap = {
+      'name': ingredientName,
+      'quantity': ingredientQuantity,
+    };
+
+    ingredientsWithQuantities.add(ingredientMap);
+  }
+
+  UserRecipe recipe = UserRecipe(
+    name: recipeNameController.text,
+    description: descriptionController.text,
+    ingredients: ingredientsWithQuantities,
+    direction: directionController.text,
+    time: timeController.text,
+    imagePath: photo != null ? photo!.path : '',
+  );
+
+  if (widget.recipe != null) {
+    // If recipe is not null, then it means we are updating an existing recipe
+    // In this case, you need to handle the index externally
+    if (widget.recipeIndex != null) {
+      await HiveService.updateRecipe(widget.recipeIndex!, recipe);
+    } else {
+      print("Error: Recipe index is null.");
+    }
+  } else {
+    // If recipe is null, then it means we are saving a new recipe
+    await HiveService.saveRecipe(recipe);
+  }
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => CustomCurvedNavigationBar()),
+  );
+}
+
 
   Future<void> _getImage({required BuildContext context}) async {
     final pickedFile =

@@ -25,6 +25,24 @@ class CustomWidget {
     );
   }
 
+  static TextStyle heading32(BuildContext context) {
+    return const TextStyle(
+      fontSize: 22.0,
+      fontWeight: FontWeight.w500,
+      // Add any other styling properties as needed
+    );
+  }
+
+
+  static TextStyle heading31(BuildContext context) {
+    return const TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.w600,
+      color: Color(0xFFE23E3E),
+      // Add any other styling properties as needed
+    );
+  }
+
   static TextStyle heading4(BuildContext context) {
     return const TextStyle(
       fontSize: 16,
@@ -68,6 +86,29 @@ class CustomWidget {
           borderRadius: BorderRadius.circular(12),
           side: const BorderSide(
             color: Color(0xFFE23E3E), // Set outline color
+          ),
+        ),
+      ),
+      child: Text(
+        buttonText,
+        style: heading5(context),
+      ),
+    );
+  }
+
+  static ElevatedButton whitecustomButton(
+      BuildContext context, String buttonText, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white,
+        padding:
+            const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 8),
+        backgroundColor: Color(0xFFE23E3E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(
+            color: Colors.white,
           ),
         ),
       ),

@@ -8,8 +8,9 @@ import '../Hive/data_model.dart';
 
 class UserAddRecipe extends StatelessWidget {
   final UserRecipe recipe;
+  final int recipeIndex;
 
-  const UserAddRecipe({Key? key, required this.recipe}) : super(key: key);
+  const UserAddRecipe({Key? key, required this.recipe,required this.recipeIndex}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +58,7 @@ class UserAddRecipe extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        AddRecipe(recipe: recipe),
+                                        AddRecipe(recipe: recipe,recipeIndex: recipeIndex,),
                                   ),
                                 );
                               },

@@ -1,11 +1,8 @@
-
-
 import 'package:hive/hive.dart';
 part 'data_model.g.dart';
 
 @HiveType(typeId: 0)
 class UserRecipe {
-  
   @HiveField(0)
   final String name;
 
@@ -45,4 +42,50 @@ class FavRecipe extends HiveObject {
   late Map<String, dynamic> recipeData;
 
   FavRecipe({required this.recipeName, required this.recipeData});
+}
+
+@HiveType(typeId: 2)
+class CartIngredients extends HiveObject {
+  @HiveField(0)
+  late String recipeName;
+
+  @HiveField(1)
+  late Map<String, dynamic> recipeData;
+
+  CartIngredients({
+    required this.recipeName,
+    required this.recipeData,
+  });
+}
+
+@HiveType(typeId: 3)
+class ExtraIngredients extends HiveObject {
+  @HiveField(0)
+  final List<Map<String, String>> ingredients;
+
+  ExtraIngredients({
+    required this.ingredients,
+  });
+}
+
+@HiveType(typeId: 4)
+class EditProfile extends HiveObject {
+  @HiveField(0)
+  late String name;
+
+  @HiveField(1)
+  late String description;
+
+  @HiveField(2)
+  late int phone;
+
+  @HiveField(3)
+  late String profilePhotoPath;
+
+  EditProfile({
+    required this.name,
+    required this.description,
+    required this.phone,
+    required this.profilePhotoPath,
+  });
 }

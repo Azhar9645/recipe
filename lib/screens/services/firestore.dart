@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future addUserDetails(String fullName, String email) async {
     await FirebaseFirestore.instance.collection('Users').add({
@@ -34,6 +36,24 @@ class FirestoreServices {
     } catch (error) {
       print("Error fetching user data: $error");
       return null;
+    }
+  }
+
+  Future<void> updateUserDetails(String fullName, String email,
+      String? description, String? phone, String? photoBase64) async {
+    try {
+      String uid = _auth.currentUser!.uid; // Get the current user's UID
+
+      await _firestore.collection('Users').doc(uid).set({
+        'full name': fullName,
+        'email': email,
+        'description': description,
+        'phone': phone,
+        'photo': photoBase64,
+      }, SetOptions(merge: true)); // Merge with existing data if any
+    } catch (error) {
+      print("Error updating user details: $error");
+      throw error; // Rethrow the error for handling at the calling site
     }
   }
 
@@ -85,11 +105,7 @@ class FirestoreServices {
           .doc(docID)
           .set(recipeData);
 
-      await recipes
-          .doc('All')
-          .collection('recipes')
-          .doc(docID)
-          .set(recipeData);
+      await recipes.doc('All').collection('recipes').doc(docID).set(recipeData);
     } catch (error) {
       print("Error adding recipe to Firestore: $error");
     }
@@ -201,6 +217,4 @@ class FirestoreServices {
       return Stream.value([]);
     }
   }
-
-  
 }
