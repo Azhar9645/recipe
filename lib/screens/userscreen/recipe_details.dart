@@ -5,7 +5,6 @@ import 'package:recipe_app1/screens/Hive/data_model.dart';
 import 'package:recipe_app1/screens/Hive/function.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
-import 'package:recipe_app1/screens/userscreen/cart.dart';
 
 class UserRecipeDetailsPage extends StatelessWidget {
   final Map<String, dynamic> recipeData;

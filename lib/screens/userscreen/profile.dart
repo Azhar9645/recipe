@@ -65,8 +65,7 @@ class _ProfileState extends State<Profile> {
       } catch (error) {
         print("Error fetching user data: $error");
       }
-    } else {
-    }
+    } else {}
   }
 
   @override

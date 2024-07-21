@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/mytextfield.dart';

@@ -19,6 +19,8 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('UserData: $userData'); // Debugging: Print userData to console
+
     return Drawer(
       child: Container(
         color: Color(0xFFC1C1C1),
@@ -27,11 +29,11 @@ class MyDrawer extends StatelessWidget {
           children: <Widget>[
             UserAccountsDrawerHeader(
               accountName: Text(
-                '${userData!['full name'] ?? 'N/A'}',
+                '${userData?['full name'] ?? 'N/A'}',
                 style: TextStyle(color: Colors.white, fontSize: 20.0),
               ),
               accountEmail: Text(
-                '${userData!['email'] ?? 'N/A'}',
+                '${userData?['email'] ?? 'N/A'}',
                 style: TextStyle(color: Colors.white),
               ),
               decoration: BoxDecoration(
@@ -145,7 +147,7 @@ class MyDrawer extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child:
-                CustomWidget.customButton(context, 'Yes,log Me Out', () async {
+                CustomWidget.customButton(context, 'Yes, log Me Out', () async {
               // Perform the logout if the user confirms
               await signout(context);
               // Show a Snackbar indicating successful logout

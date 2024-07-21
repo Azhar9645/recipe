@@ -1,16 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:recipe_app1/screens/components/widgets.dart';
 import 'package:recipe_app1/screens/userscreen/recipe_details.dart';
-import 'package:recipe_app1/screens/userscreen/recipe_item.dart';
 
 class RecipeListItem extends StatelessWidget {
   final String recipeName;
   final String recipeTime;
   final Map<String, dynamic> recipeData;
 
-  RecipeListItem({required this.recipeName, required this.recipeTime, required this.recipeData});
+  RecipeListItem(
+      {required this.recipeName,
+      required this.recipeTime,
+      required this.recipeData});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +19,13 @@ class RecipeListItem extends StatelessWidget {
 
     return ListTile(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (content)=>RecipeDetails(recipeName: recipeName, recipeData: recipeData)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (content) =>
+                    UserRecipeDetailsPage(recipeData: recipeData)));
       },
-      contentPadding: const EdgeInsets.only(left: 18,right: 18),
+      contentPadding: const EdgeInsets.only(left: 18, right: 18),
       leading: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: Image.memory(
@@ -40,7 +45,6 @@ class RecipeListItem extends StatelessWidget {
         'Time: $recipeTime',
         style: TextStyle(fontSize: 14.0, color: Colors.grey),
       ),
-      
     );
   }
 }
