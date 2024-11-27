@@ -6,8 +6,8 @@
   <img src="./assets/images/Screenshot_1712140888.png" alt="App Screenshot 1" width="200" />
   <img src="./assets/images/Screenshot_1721713960.png" alt="App Screenshot 2" width="200" />
   <img src="./assets/images/Screenshot_1721714909.png" alt="App Screenshot 3" width="200" />
-  <img src="./assets/images/Screenshot_1721713994.png" alt="App Screenshot 5" width="200" />
-  <img src="./assets/images/Screenshot_1721714052.png" alt="App Screenshot 4" width="200" />
+  <img src="./assets/images/Screenshot_1721713994.png" alt="App Screenshot 4" width="200" />
+  <img src="./assets/images/Screenshot_1721714052.png" alt="App Screenshot 5" width="200" />
   <img src="./assets/images/Screenshot_1721714021.png" alt="App Screenshot 6" width="200" />
   <img src="./assets/images/Screenshot_1721714046.png" alt="App Screenshot 7" width="200" />
   <img src="./assets/images/Screenshot_1732681510.png" alt="App Screenshot 8" width="200" />
