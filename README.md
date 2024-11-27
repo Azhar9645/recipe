@@ -6,6 +6,8 @@
   <img src="./assets/images/Screenshot_1712140888.png" alt="App Screenshot 1" width="200" />
   <img src="./assets/images/Screenshot_1721713960.png" alt="App Screenshot 2" width="200" />
   <img src="./assets/images/Screenshot_1721714909.png" alt="App Screenshot 3" width="200" />
+  <img src="./assets/images/Screenshot_1721714052.png" alt="App Screenshot 4" width="200" />
+
 
 </div>
 
@@ -28,11 +30,7 @@
 ## Technologies Used 🛠️
 
 - **Framework**: Flutter
-- **State Management**: Bloc
 - **Database**: Firebase, Hive
-- **API Integration**: Open APIs for recipes and ingredients
 
----
 
-## Screenshots 📸
 
