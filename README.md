@@ -7,8 +7,10 @@
   <img src="./assets/images/Screenshot_1721713960.png" alt="App Screenshot 2" width="200" />
   <img src="./assets/images/Screenshot_1721714909.png" alt="App Screenshot 3" width="200" />
   <img src="./assets/images/Screenshot_1721714052.png" alt="App Screenshot 4" width="200" />
-
-
+  <img src="./assets/images/Screenshot_1721713994.png" alt="App Screenshot 5" width="200" />
+  <img src="./assets/images/Screenshot_1721714021.png" alt="App Screenshot 6" width="200" />
+  <img src="./assets/images/Screenshot_1721714046.png" alt="App Screenshot 7" width="200" />
+  <img src="./assets/images/Screenshot_1732681510.png" alt="App Screenshot 8" width="200" />
 </div>
 
 **Recipe Rover** is a mobile application designed to help users manage their recipes, organize inventory, and explore culinary delights. With an intuitive interface and powerful features, Recipe Rover is your ultimate recipe management companion.
