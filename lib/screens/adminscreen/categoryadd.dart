@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/adminscreen/categorypage.dart';
-import 'package:recipe_app1/screens/adminscreen/function_category_add.dart';
 import 'package:recipe_app1/screens/components/mybutton.dart';
 import 'package:recipe_app1/screens/components/mytextfield.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';

@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
-import 'package:recipe_app1/screens/components/hiddenDrawer/about.dart';
 
 class HiddenDrawer extends StatefulWidget {
   const HiddenDrawer({super.key});

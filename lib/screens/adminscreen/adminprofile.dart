@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:recipe_app1/screens/adminscreen/bottomnavbaradmin.dart';
 import 'package:recipe_app1/screens/adminscreen/total_user_admin.dart';
 import 'package:recipe_app1/screens/components/color.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';

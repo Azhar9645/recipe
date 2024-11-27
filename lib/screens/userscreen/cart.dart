@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:recipe_app1/screens/Hive/data_model.dart';
 import 'package:recipe_app1/screens/Hive/function.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
-import 'package:recipe_app1/screens/userscreen/cart_extra_ingredients.dart';
 
 class Cart extends StatefulWidget {
   final String? recipeName;

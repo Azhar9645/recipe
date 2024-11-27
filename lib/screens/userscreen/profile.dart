@@ -4,18 +4,13 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:recipe_app1/screens/Hive/data_model.dart';
 import 'package:recipe_app1/screens/Hive/function.dart';
 import 'package:recipe_app1/screens/components/drawer.dart';
 import 'package:recipe_app1/screens/components/normalbutton.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
-import 'package:recipe_app1/screens/loginscreen/signin.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';
-import 'package:recipe_app1/screens/userscreen/edit_profile.dart';
-import 'package:recipe_app1/screens/userscreen/recipe_details.dart';
 import 'package:recipe_app1/screens/userscreen/user_add_recipe_details.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   Profile({Key? key}) : super(key: key);

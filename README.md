@@ -1,16 +1,38 @@
-# recipe_app1
+# RecipeRover 🍴📱
 
-A new Flutter project.
+## App Screenshot 📸
 
-## Getting Started
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+  <img src="./assets/images/Screenshot_1712140888.png" alt="App Screenshot 1" width="300" />
+  <img src="./assets/images/Screenshot_1721713960.png" alt="App Screenshot 2" width="300" />
+  <img src="./assets/images/Screenshot_1721714909.png" alt="App Screenshot 2" width="300" />
 
-This project is a starting point for a Flutter application.
+</div>
 
-A few resources to get you started if this is your first Flutter project:
+**Recipe Rover** is a mobile application designed to help users manage their recipes, organize inventory, and explore culinary delights. With an intuitive interface and powerful features, Recipe Rover is your ultimate recipe management companion.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Features ✨
+
+- **Recipe Management**: Add, save, and organize recipes effortlessly.
+- **Ingredient Search**: Find recipes based on available ingredients and taste preferences.
+- **Shopping List**: Create a shopping list of required ingredients.
+- **Private Recipes**: Securely store and manage your private recipes.
+- **Favorites**: Save your most loved recipes for quick access.
+- **Firebase & Hive Integration**: Securely store and sync your data across devices.
+- **User-Friendly Interface**: Navigate the app with ease and enjoy a seamless experience.
+
+---
+
+## Technologies Used 🛠️
+
+- **Framework**: Flutter
+- **State Management**: Bloc
+- **Database**: Firebase, Hive
+- **API Integration**: Open APIs for recipes and ingredients
+
+---
+
+## Screenshots 📸
+

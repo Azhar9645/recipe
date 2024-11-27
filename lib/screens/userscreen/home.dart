@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:recipe_app1/screens/components/loading.dart';
 import 'package:recipe_app1/screens/components/shimmer_home.dart';
 import 'package:recipe_app1/screens/components/widgets.dart';
 import 'package:recipe_app1/screens/services/firestore.dart';

@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:recipe_app1/screens/Hive/data_model.dart'
-    as HiveModel; // Import with prefix
 import 'package:recipe_app1/screens/components/hiddenDrawer/about.dart';
 import 'package:recipe_app1/screens/components/hiddenDrawer/help.dart';
 import 'package:recipe_app1/screens/components/hiddenDrawer/settings.dart';
